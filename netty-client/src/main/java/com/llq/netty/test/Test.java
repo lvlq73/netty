@@ -21,7 +21,7 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         //并行度10000
-        int parallel = 10000;
+        int parallel = 500;
         //调用成功计数
         AtomicInteger successCount = new AtomicInteger();
         //调用失败计数
@@ -46,7 +46,8 @@ public class Test {
                         signal.await();
                         //long start = System.currentTimeMillis();
                         IHelloService helloService = proxy.create(IHelloService.class);
-                        String result = helloService.hello("test"+ finalI);
+                        //String result = helloService.hello("test"+ finalI);
+                        int result = helloService.sum(finalI, finalI * Math.round(10));
                         System.out.println(result);
                         successCount.incrementAndGet();
                         // long end = System.currentTimeMillis();

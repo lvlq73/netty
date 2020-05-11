@@ -7,4 +7,6 @@ package com.llq.netty.api;
  */
 public interface IHelloService {
     String hello(String name);
+
+    int sum(int one, int two);
 }

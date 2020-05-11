@@ -74,13 +74,13 @@ public class RpcClient extends PoolObject{
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast(new RpcFrameDecoder());
-                    pipeline.addLast(new RpcFrameEncoder());
+                    pipeline.addLast("frameDecoder", new RpcFrameDecoder());
+                    pipeline.addLast("frameEncoder", new RpcFrameEncoder());
 
-                    pipeline.addLast(new RpcProtocolEncoder());
-                    pipeline.addLast(new RpcProtocolDecoder());
+                    pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
+                    pipeline.addLast("protocolDecoder", new RpcProtocolDecoder());
 
-                    pipeline.addLast(new ResponseDispatcherHandler(REQUEST_PENDING_CENTER));
+                    pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler(REQUEST_PENDING_CENTER));
 
                     //pipeline.addLast(new LoggingHandler(LogLevel.INFO));
                 }

@@ -5,13 +5,11 @@ import com.llq.netty.codec.RpcFrameDecoder;
 import com.llq.netty.codec.RpcFrameEncoder;
 import com.llq.netty.codec.RpcProtocolDecoder;
 import com.llq.netty.codec.RpcProtocolEncoder;
+import com.llq.netty.handler.MetricsHandler;
 import com.llq.netty.handler.RpcHandler;
 import com.llq.netty.service.HelloServiceImpl;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -19,6 +17,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,29 +53,37 @@ public class Server {
         serverBootstrap.channel(NioServerSocketChannel.class);
 
         serverBootstrap.handler(new LoggingHandler(LogLevel.INFO));
-        NioEventLoopGroup group = new NioEventLoopGroup();
+        NioEventLoopGroup boss = new NioEventLoopGroup(0, new DefaultThreadFactory("boss"));
+        NioEventLoopGroup work = new NioEventLoopGroup(0, new DefaultThreadFactory("work"));
         try{
-            serverBootstrap.group(group);
+            serverBootstrap.group(boss, work);
             //nagle算法，将小的碎片数据连接成更大的报文来提高发送效率
             serverBootstrap.childOption(NioChannelOption.TCP_NODELAY, true);
             //最大等待连接数
             serverBootstrap.option(NioChannelOption.SO_BACKLOG, 1024);
             //serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
 
+            //metrics
+            MetricsHandler metricsHandler = new MetricsHandler();
+
             serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ChannelPipeline pipeline = ch.pipeline();
 
-                    pipeline.addLast(new RpcFrameDecoder());
-                    pipeline.addLast(new RpcFrameEncoder());
+                    pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
 
-                    pipeline.addLast(new RpcProtocolEncoder());
-                    pipeline.addLast(new RpcProtocolDecoder());
+                    pipeline.addLast("metricHandler", metricsHandler);
+
+                    pipeline.addLast("frameDecoder", new RpcFrameDecoder());
+                    pipeline.addLast("frameEncoder", new RpcFrameEncoder());
+
+                    pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
+                    pipeline.addLast("protocolDecoder", new RpcProtocolDecoder());
 
                     pipeline.addLast(new LoggingHandler(LogLevel.INFO));
 
-                    pipeline.addLast(new RpcHandler());
+                    pipeline.addLast("handler", new RpcHandler());
                 }
             });
 

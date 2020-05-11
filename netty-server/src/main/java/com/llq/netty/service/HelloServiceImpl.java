@@ -17,4 +17,10 @@ public class HelloServiceImpl implements IHelloService {
         logger.info("----------------接收："+name);
         return "Hello! " + name;
     }
+
+    @Override
+    public int sum(int one, int two) {
+        logger.info("----------------接收："+ one + "+" + two);
+        return one + two;
+    }
 }
