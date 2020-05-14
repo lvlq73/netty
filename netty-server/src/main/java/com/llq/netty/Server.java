@@ -18,6 +18,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +66,8 @@ public class Server {
 
             //metrics
             MetricsHandler metricsHandler = new MetricsHandler();
+            //业务线程池
+            UnorderedThreadPoolEventExecutor business = new UnorderedThreadPoolEventExecutor(10, new DefaultThreadFactory("business"));
 
             serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
@@ -83,7 +86,7 @@ public class Server {
 
                     pipeline.addLast(new LoggingHandler(LogLevel.INFO));
 
-                    pipeline.addLast("handler", new RpcHandler());
+                    pipeline.addLast(business, "handler", new RpcHandler());
                 }
             });
 

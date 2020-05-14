@@ -29,8 +29,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcMessage<RpcRequestBody> requestMessage) throws Exception {
-       // BusinessThreadPool.submit(new BusinessThread(ctx, requestMessage));
-        RpcMessage<RpcResponseBody> responseMessage = new RpcMessage();
+        RpcMessage responseMessage = new RpcMessage();
         RpcRequestBody requestBody = requestMessage.getMessageBody();
         LOGGER.info("服务端接收消息，streamId:{}", requestMessage.getMessageHeader().getStreamId());
         try {

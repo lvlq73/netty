@@ -1,8 +1,11 @@
 package com.llq.netty.service;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.llq.netty.api.IHelloService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lvlianqi
@@ -21,6 +24,7 @@ public class HelloServiceImpl implements IHelloService {
     @Override
     public int sum(int one, int two) {
         logger.info("----------------接收："+ one + "+" + two);
+        //Uninterruptibles.sleepUninterruptibly(3 , TimeUnit.SECONDS);
         return one + two;
     }
 }
