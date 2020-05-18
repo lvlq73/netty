@@ -21,7 +21,7 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         //并行度10000
-        int parallel = 500;
+        int parallel = 10000;
         //调用成功计数
         AtomicInteger successCount = new AtomicInteger();
         //调用失败计数
@@ -37,7 +37,8 @@ public class Test {
         //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new Client());
         //客户端运用对象池
         RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new ClientPool());
-        for (int i=0;i<parallel;i++) {
+        LOGGER.info("并发数据开始准备----------------");
+        for (int i = 0; i < parallel; i++) {
             int finalI = i;
             new Thread(new Runnable() {
                 @Override
@@ -47,13 +48,11 @@ public class Test {
                         //long start = System.currentTimeMillis();
                         IHelloService helloService = proxy.create(IHelloService.class);
                         //String result = helloService.hello("test"+ finalI);
-                        int result = helloService.sum(finalI, finalI * Math.round(10));
+                        int result = helloService.sum(finalI, finalI * (int)(Math.random() * 10));
                         System.out.println(result);
                         successCount.incrementAndGet();
                         // long end = System.currentTimeMillis();
                         //  System.out.println("耗时："+ (end-start)+"毫秒-----------结果："+result);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
                     } catch (Throwable e) {
                         failCount.incrementAndGet();
                     } finally {
@@ -62,7 +61,7 @@ public class Test {
                 }
             }).start();
         }
-
+        LOGGER.info("并发数据准备完成----------------");
         //10000个并发线程瞬间发起请求操作
         signal.countDown();
         finish.await();

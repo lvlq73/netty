@@ -39,8 +39,14 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
             responseMessage.setMessageBody(new RpcResponseBody(t));
         }
         responseMessage.setMessageHeader(requestMessage.getMessageHeader());
-        ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);
-        LOGGER.info("服务端处理消息完毕，streamId:{}", requestMessage.getMessageHeader().getStreamId());
+        //防止oom
+        if(ctx.channel().isActive() && ctx.channel().isWritable()) {
+            ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);
+            LOGGER.info("服务端处理消息完毕，streamId:{}", requestMessage.getMessageHeader().getStreamId());
+        } else {
+            //数据丢失，或者可以做其他处理
+            LOGGER.error("message dropped");
+        }
     }
 
     /**

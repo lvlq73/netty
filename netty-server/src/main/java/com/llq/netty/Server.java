@@ -9,12 +9,14 @@ import com.llq.netty.handler.MetricsHandler;
 import com.llq.netty.handler.RpcHandler;
 import com.llq.netty.service.HelloServiceImpl;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-
+import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
@@ -22,15 +24,13 @@ import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
  * @author lvlianqi
- * @description 服务端
+ * @description 服务端，运行在linux可修改Nio为Epoll来提高性能（native）
  * @createDate 2020/4/26
  */
 public class Server {
@@ -69,6 +69,9 @@ public class Server {
             //业务线程池
             UnorderedThreadPoolEventExecutor business = new UnorderedThreadPoolEventExecutor(10, new DefaultThreadFactory("business"));
 
+            //流量整形,看情况设置
+            //GlobalTrafficShapingHandler globalTrafficShapingHandler = new GlobalTrafficShapingHandler(new NioEventLoopGroup(), 100 * 1024 * 1024, 100 * 1024 * 1024);
+
             serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
@@ -76,6 +79,8 @@ public class Server {
 
                     pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
 
+                    //pipeline.addLast("TShandler", globalTrafficShapingHandler);
+                    //监控指标
                     pipeline.addLast("metricHandler", metricsHandler);
 
                     pipeline.addLast("frameDecoder", new RpcFrameDecoder());
@@ -83,6 +88,12 @@ public class Server {
 
                     pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
                     pipeline.addLast("protocolDecoder", new RpcProtocolDecoder());
+
+                    //减少flush的次数，牺牲延迟增加吞吐量，参数设置5为读取5次进行一次flush, consolidateWhenNoReadInProgress为true为异步情况下的优化flush
+                    //FlushConsolidationHandler里的readInProgress参数
+                    //同步 ：read -> writeAndFlush -> readComplete  readInProgress为true发生在read 到 readComplete之间
+                    //异步 : read -> readComplete -> writeAndFlush（因为开启异步所以可能发生在readComplete之后） readInProgress为true发生在read 到 readComplete之间
+                    pipeline.addLast("flushEnhance", new FlushConsolidationHandler(5, true));
 
                     pipeline.addLast(new LoggingHandler(LogLevel.INFO));
 

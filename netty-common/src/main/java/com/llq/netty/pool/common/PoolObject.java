@@ -39,7 +39,7 @@ public abstract class PoolObject {
         try {
             objectPool.returnObject(this);
             //System.out.println("---------------------归还对象成功,对象编码："+code);
-            //LOGGER.info("---------------------归还对象成功,对象编码：{}-----------------------------------", code);
+            //LOGGER.info("---------------------归还对象成功,对象名：{} 对象编码：{}-----------------------------------", this.getClass().getSimpleName(), code);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }

@@ -31,34 +31,12 @@ public class RpcProxy {
 
     @SuppressWarnings("unchecked")
     public <T> T create(Class<?> interfaceClass) {
-        return (T) Proxy.newProxyInstance(
-                interfaceClass.getClassLoader(),
-                new Class<?>[]{interfaceClass},
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        RpcRequestBody request = new RpcRequestBody(); // 创建并初始化 RPC 请求
-                        request.setClassName(method.getDeclaringClass().getName());
-                        request.setMethodName(method.getName());
-                        request.setParameterTypes(method.getParameterTypes());
-                        request.setParameters(args);
-
-                        /*if (serviceDiscovery != null) {
-                            serverAddress = serviceDiscovery.discover(); // 发现服务
-                        }*/
-
-                        String[] array = serverAddress.split(":");
-                        String host = array[0];
-                        int port = Integer.parseInt(array[1]);
-
-                        RpcResponseBody response = rpcClient.send(host, port, request); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
-                        if (response.getError() != null) {
-                            throw response.getError();
-                        } else {
-                            return response.getResult();
-                        }
-                    }
-                }
-        );
+        ProxyPool proxyPool = PoolUtil.getObject(ProxyPool.class);
+        try {
+            return (T) proxyPool.getProxyObject(serverAddress, rpcClient, interfaceClass);
+        } finally {
+            //获取后直接归还，让其他线程使用，实现一个代理对象可以处理多个线程请求，减少对象的开销
+            proxyPool.returnObject();
+        }
     }
 }

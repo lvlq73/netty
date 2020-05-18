@@ -22,7 +22,7 @@ public class PoolUtil{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PoolUtil.class);
 
-    private static final int maxTotal = 5;// 最大线程数
+    private static final int maxTotal = 10;// 最大线程数
     private static final int maxIdle = 5;// 最大闲置线程
     private static final int minIdle = 5;// 最小闲置线程
     /**
@@ -76,7 +76,7 @@ public class PoolUtil{
         try {
             poolObject = objectPool.borrowObject();// 从线程池获取对象，
             //System.out.println("---------------------获取对象成功,对象编码："+threadPoolHandler.getCode());
-            //LOGGER.info("---------------------获取对象成功,对象编码：{}-----------------------------------", poolObject.getCode());
+            //LOGGER.info("---------------------获取对象成功,对象名：{}对象编码：{}-----------------------------------", poolObject.getClass().getSimpleName(), poolObject.getCode());
             poolObject.setObjectPool(objectPool);
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
