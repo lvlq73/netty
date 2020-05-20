@@ -11,23 +11,19 @@ import com.llq.netty.handler.ResponseDispatcherHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author lvlianqi
  * @description
  * @createDate 2020/5/19
  */
-public class RpcClientInit implements Runnable{
+public class RpcClientInit{
 
     private String host;
     private int port;
@@ -51,8 +47,7 @@ public class RpcClientInit implements Runnable{
         return channelFuture;
     }
 
-    @Override
-    public void run() {
+    public void init() {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
 

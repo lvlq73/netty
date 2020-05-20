@@ -37,7 +37,7 @@ public class ClientPool implements IRpcClient {
             synchronized (RpcClientInit.class){
                 if (rpcClientInit == null) {
                     rpcClientInit = new RpcClientInit(host, port);
-                    rpcClientInit.run();
+                    rpcClientInit.init();
                     System.out.println("init...");
                 }
             }

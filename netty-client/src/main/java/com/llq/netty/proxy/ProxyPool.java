@@ -14,6 +14,7 @@ import java.lang.reflect.Proxy;
  * @description 代理池对象
  * @createDate 2020/5/14
  */
+@Deprecated
 public class ProxyPool extends PoolObject {
 
     @SuppressWarnings("unchecked")

@@ -37,6 +37,7 @@ public class Test {
         //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new Client());
         //客户端运用对象池
         RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new ClientPool());
+        IHelloService helloService = proxy.create(IHelloService.class);
         LOGGER.info("并发数据开始准备----------------");
         for (int i = 0; i < parallel; i++) {
             int finalI = i;
@@ -46,7 +47,6 @@ public class Test {
                     try {
                         signal.await();
                         //long start = System.currentTimeMillis();
-                        IHelloService helloService = proxy.create(IHelloService.class);
                         //String result = helloService.hello("test"+ finalI);
                         int result = helloService.sum(finalI, finalI * (int)(Math.random() * 10));
                         System.out.println(result);
