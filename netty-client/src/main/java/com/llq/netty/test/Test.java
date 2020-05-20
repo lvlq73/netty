@@ -3,7 +3,9 @@ package com.llq.netty.test;
 import com.llq.netty.api.IHelloService;
 import com.llq.netty.client.Client;
 import com.llq.netty.client.ClientPool;
+import com.llq.netty.client.v1.ClientPoolV1;
 import com.llq.netty.proxy.RpcProxy;
+import com.llq.netty.proxy.RpcProxyV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
@@ -36,7 +38,8 @@ public class Test {
         //客户端没有运用对象池
         //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new Client());
         //客户端运用对象池
-        RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new ClientPool());
+        //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new ClientPool());
+        RpcProxyV1 proxy = new RpcProxyV1("127.0.0.1:8000", new ClientPoolV1());
         IHelloService helloService = proxy.create(IHelloService.class);
         LOGGER.info("并发数据开始准备----------------");
         for (int i = 0; i < parallel; i++) {

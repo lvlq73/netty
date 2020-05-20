@@ -20,18 +20,18 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * @author lvlianqi
- * @description
+ * @description 初始化配置，连接
  * @createDate 2020/5/19
  */
 public class RpcClientInit{
 
     private String host;
     private int port;
-    public static final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
+    public final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
     //private final static int parallel = Runtime.getRuntime().availableProcessors() * 2;
-    private static final NioEventLoopGroup GROUP = new NioEventLoopGroup();
+    private final NioEventLoopGroup GROUP = new NioEventLoopGroup();
 
-    CountDownLatch signal = new CountDownLatch(1);
+    private CountDownLatch signal = new CountDownLatch(1);
     private ChannelFuture channelFuture;
 
     public RpcClientInit(String host, int port){
@@ -45,6 +45,11 @@ public class RpcClientInit{
             signal.await();
         }
         return channelFuture;
+    }
+
+    public RpcClientInit initBuild(){
+        init();
+        return this;
     }
 
     public void init() {
