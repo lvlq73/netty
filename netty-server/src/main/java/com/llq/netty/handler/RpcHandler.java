@@ -41,7 +41,8 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
         responseMessage.setMessageHeader(requestMessage.getMessageHeader());
         //防止oom
         if(ctx.channel().isActive() && ctx.channel().isWritable()) {
-            ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);
+            //ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);
+            ctx.writeAndFlush(responseMessage);
             LOGGER.info("服务端处理消息完毕，streamId:{}", requestMessage.getMessageHeader().getStreamId());
         } else {
             //数据丢失，或者可以做其他处理

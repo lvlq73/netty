@@ -4,13 +4,10 @@ import com.llq.netty.codec.RpcFrameDecoder;
 import com.llq.netty.codec.RpcFrameEncoder;
 import com.llq.netty.codec.RpcProtocolDecoder;
 import com.llq.netty.codec.RpcProtocolEncoder;
-import com.llq.netty.entity.ResultVo;
-import com.llq.netty.entity.RpcMessage;
-import com.llq.netty.entity.RpcRequestBody;
-import com.llq.netty.entity.RpcResponseBody;
-import com.llq.netty.handler.*;
-import com.llq.netty.pool.common.PoolObject;
-import com.llq.netty.utils.IdUtil;
+import com.llq.netty.handler.ClientIdleCheckHandler;
+import com.llq.netty.handler.KeepaliveHandler;
+import com.llq.netty.handler.RequestPendingCenter;
+import com.llq.netty.handler.ResponseDispatcherHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -19,50 +16,47 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author lvlianqi
- * @description rpc 客户端
- * @createDate 2020/4/27
+ * @description
+ * @createDate 2020/5/19
  */
-public class RpcClient extends PoolObject{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
+public class RpcClientInit implements Runnable{
 
     private String host;
     private int port;
-    private static final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
+    public static final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
+    //private final static int parallel = Runtime.getRuntime().availableProcessors() * 2;
     private static final NioEventLoopGroup GROUP = new NioEventLoopGroup();
 
-    /*public RpcClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }*/
+    CountDownLatch signal = new CountDownLatch(1);
+    private ChannelFuture channelFuture;
 
-    public void setHostAndPort(String host, int port) {
+    public RpcClientInit(String host, int port){
         this.host = host;
         this.port = port;
     }
 
-    /**
-     * 发送请求
-     * @param requestBody
-     * @return RpcResponseBody
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    public RpcResponseBody send(RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
+    public ChannelFuture getChannelFuture() throws InterruptedException {
+        //Netty服务端链路没有建立完毕之前，先挂起等待
+        if (channelFuture == null) {
+            signal.await();
+        }
+        return channelFuture;
+    }
 
+    @Override
+    public void run() {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
 
-        try{
+        try {
             bootstrap.group(GROUP);
 
             KeepaliveHandler keepaliveHandler = new KeepaliveHandler();
@@ -85,7 +79,6 @@ public class RpcClient extends PoolObject{
                     pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler(REQUEST_PENDING_CENTER));
 
                     pipeline.addLast(keepaliveHandler);
-
                     //pipeline.addLast(new LoggingHandler(LogLevel.INFO));
                 }
             });
@@ -94,26 +87,12 @@ public class RpcClient extends PoolObject{
 
             channelFuture.sync();
 
-            //组装数据
-            long streamId = IdUtil.nextId();
-            RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
-            //添加future到请求等待中心
-            RpcResultFuture rpcResultFuture = new RpcResultFuture();
-            REQUEST_PENDING_CENTER.add(streamId, rpcResultFuture);
+            this.channelFuture = channelFuture;
 
-            channelFuture.channel().writeAndFlush(request);
-
-            RpcResponseBody responseBody = rpcResultFuture.get(6, TimeUnit.SECONDS);
-            /*if (responseBody != null) {
-                channelFuture.channel().closeFuture().sync();
-            }*/
-            return responseBody;
-        } catch (TimeoutException e) {
-            LOGGER.error("请求超时");
-            return ResultVo.error("请求超时", e);
-        } finally {
-            //GROUP.shutdownGracefully();
-            //returnObject();
+            //唤醒等待客户端RPC线程
+            signal.countDown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

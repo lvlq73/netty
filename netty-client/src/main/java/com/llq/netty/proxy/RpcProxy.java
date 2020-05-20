@@ -20,6 +20,7 @@ public class RpcProxy {
     //private ServiceDiscovery serviceDiscovery;
     private IRpcClient rpcClient;
 
+
     public RpcProxy(String serverAddress, IRpcClient rpcClient) {
         this.serverAddress = serverAddress;
         this.rpcClient = rpcClient;

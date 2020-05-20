@@ -7,6 +7,7 @@ import com.llq.netty.codec.RpcProtocolDecoder;
 import com.llq.netty.codec.RpcProtocolEncoder;
 import com.llq.netty.handler.MetricsHandler;
 import com.llq.netty.handler.RpcHandler;
+import com.llq.netty.handler.ServerIdleCheckHandler;
 import com.llq.netty.service.HelloServiceImpl;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -82,6 +83,8 @@ public class Server {
                     //pipeline.addLast("TShandler", globalTrafficShapingHandler);
                     //监控指标
                     pipeline.addLast("metricHandler", metricsHandler);
+                    //服务端idle检测
+                    pipeline.addLast("idleHandler", new ServerIdleCheckHandler());
 
                     pipeline.addLast("frameDecoder", new RpcFrameDecoder());
                     pipeline.addLast("frameEncoder", new RpcFrameEncoder());

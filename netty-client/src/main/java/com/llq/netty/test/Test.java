@@ -72,6 +72,6 @@ public class Test {
         System.out.println(tip);
         LOGGER.info(tip);
 
-        //System.exit(0);
+        System.exit(0);
     }
 }
