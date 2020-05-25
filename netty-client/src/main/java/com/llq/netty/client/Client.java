@@ -13,9 +13,12 @@ import java.util.concurrent.ExecutionException;
  */
 public class Client implements IRpcClient {
 
+    private final RpcClient client = new RpcClient();
+
     @Override
     public RpcResponseBody send(String host, int port, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
-        RpcClient client = new RpcClient(); // 初始化 RPC 客户端
+        // 初始化 RPC 客户端
+        //RpcClient client = new RpcClient();
         client.setHostAndPort(host, port);
         RpcResponseBody response = client.send(requestBody);
         return response;

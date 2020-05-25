@@ -1,8 +1,5 @@
 package com.llq.netty.pool.common;
 
-import com.llq.netty.pool.thread.IThreadPoolExecute;
-import com.llq.netty.pool.thread.ThreadPoolFactory;
-import com.llq.netty.pool.thread.ThreadPoolHandler;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -11,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author lvlianqi

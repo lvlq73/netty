@@ -4,7 +4,7 @@ import com.llq.netty.Server;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
-import io.netty.channel.ChannelFutureListener;
+import com.llq.netty.ioc.BeanIoc;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
             responseMessage.setMessageBody(new RpcResponseBody(t));
         }
         responseMessage.setMessageHeader(requestMessage.getMessageHeader());
-        //防止oom
+        //防止oom内存溢出
         if(ctx.channel().isActive() && ctx.channel().isWritable()) {
             //ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);
             ctx.writeAndFlush(responseMessage);
@@ -58,7 +58,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
      */
     private Object handle(RpcRequestBody requestBody) throws Throwable {
         String className = requestBody.getClassName();
-        Object serviceBean = Server.handlerMap.get(className);
+        Object serviceBean = BeanIoc.getBean(className);
 
         Class<?> serviceClass = serviceBean.getClass();
         String methodName = requestBody.getMethodName();

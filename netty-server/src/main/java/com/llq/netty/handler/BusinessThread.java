@@ -4,6 +4,7 @@ import com.llq.netty.Server;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
+import com.llq.netty.ioc.BeanIoc;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
  * @description
  * @createDate 2020/5/8
  */
+@Deprecated
 public class BusinessThread implements Runnable{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessThread.class);
@@ -52,7 +54,7 @@ public class BusinessThread implements Runnable{
      */
     private Object handle(RpcRequestBody requestBody) throws Throwable {
         String className = requestBody.getClassName();
-        Object serviceBean = Server.handlerMap.get(className);
+        Object serviceBean = BeanIoc.getBean(className);
 
         Class<?> serviceClass = serviceBean.getClass();
         String methodName = requestBody.getMethodName();

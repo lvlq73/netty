@@ -31,11 +31,11 @@ import java.util.concurrent.ExecutionException;
  * @description 服务端，运行在linux可修改Nio为Epoll来提高性能（native）
  * @createDate 2020/4/26
  */
-public class Server {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+public class Server1 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server1.class);
 
     //服务端口
-    private static final int port = 8000;
+    private static final int port = 8001;
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         BeanIoc.init();

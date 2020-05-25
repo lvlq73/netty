@@ -15,15 +15,19 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
  * @author lvlianqi
- * @description 初始化配置，连接
+ * @description 初始化建立连接
  * @createDate 2020/5/19
  */
-public class RpcClientInit{
+public class RpcClientConnect {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientConnect.class);
 
     private String host;
     private int port;
@@ -34,20 +38,20 @@ public class RpcClientInit{
     private CountDownLatch signal = new CountDownLatch(1);
     private ChannelFuture channelFuture;
 
-    public RpcClientInit(String host, int port){
+    public RpcClientConnect(String host, int port){
         this.host = host;
         this.port = port;
     }
 
     public ChannelFuture getChannelFuture() throws InterruptedException {
         //Netty服务端链路没有建立完毕之前，先挂起等待
-        if (channelFuture == null) {
+        /*if (channelFuture == null) {
             signal.await();
-        }
+        }*/
         return channelFuture;
     }
 
-    public RpcClientInit initBuild(){
+    public RpcClientConnect initBuild(){
         init();
         return this;
     }
@@ -55,7 +59,6 @@ public class RpcClientInit{
     public void init() {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
-
         try {
             bootstrap.group(GROUP);
 
@@ -90,9 +93,9 @@ public class RpcClientInit{
             this.channelFuture = channelFuture;
 
             //唤醒等待客户端RPC线程
-            signal.countDown();
+            //signal.countDown();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("初始化客户端或建立连接异常", e);
         }
     }
 }

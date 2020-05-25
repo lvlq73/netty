@@ -14,19 +14,19 @@ import java.util.concurrent.ExecutionException;
  */
 public class ClientPool implements IRpcClient {
 
-    private static volatile RpcClientInit rpcClientInit;
+    private static volatile RpcClientConnect rpcClientConnect;
 
-    private static RpcClientInit getRpcClientInit(String host, int port){
-        if (rpcClientInit == null) {
-            synchronized (RpcClientInit.class){
-                if (rpcClientInit == null) {
-                    rpcClientInit = new RpcClientInit(host, port);
-                    rpcClientInit.init();
+    private static RpcClientConnect getRpcClientInit(String host, int port){
+        if (rpcClientConnect == null) {
+            synchronized (RpcClientConnect.class){
+                if (rpcClientConnect == null) {
+                    rpcClientConnect = new RpcClientConnect(host, port);
+                    rpcClientConnect.init();
                     System.out.println("init...");
                 }
             }
         }
-        return rpcClientInit;
+        return rpcClientConnect;
     }
 
     @Override
@@ -36,8 +36,8 @@ public class ClientPool implements IRpcClient {
         //RpcResponseBody response = client.send(requestBody); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
 
         RpcClientV1 client = PoolUtil.getObject(RpcClientV1.class);
-        RpcClientInit rpcClientInit = getRpcClientInit(host, port);
-        RpcResponseBody response = client.send(rpcClientInit, requestBody);
+        RpcClientConnect rpcClientConnect = getRpcClientInit(host, port);
+        RpcResponseBody response = client.send(rpcClientConnect, requestBody);
         client.returnObject(); //归还对象到对象池
         return response;
     }

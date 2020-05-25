@@ -1,6 +1,8 @@
 package com.llq.netty.client.v1;
 
-import com.llq.netty.client.RpcClientInit;
+import com.llq.netty.client.RpcClientConnect;
+import com.llq.netty.discovery.Address;
+import com.llq.netty.discovery.ServiceDiscovery;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
 import com.llq.netty.pool.common.PoolUtil;
@@ -16,41 +18,40 @@ import java.util.concurrent.ExecutionException;
  */
 public class ClientPoolV1 implements IRpcClientV1 {
 
-    private List<RpcClientInit> rpcClientInits;
+    private List<RpcClientConnect> rpcClientConnects = new ArrayList<>();
     private int currentIndex;
     private int totalServer;
 
-    private String host;
-    private int port;
+    public ClientPoolV1() {
+        load();
+    }
 
-    public void initRound() {
-        rpcClientInits = new ArrayList<>();
-        rpcClientInits.add(new RpcClientInit(host, port).initBuild());
-        rpcClientInits.add(new RpcClientInit(host, port).initBuild());
-        rpcClientInits.add(new RpcClientInit(host, port).initBuild());
-        rpcClientInits.add(new RpcClientInit(host, port).initBuild());
-        rpcClientInits.add(new RpcClientInit(host, port).initBuild());
-        totalServer = rpcClientInits.size();
+    //加载注册中心地址
+    public void load() {
+        if (rpcClientConnects.size() != 0) {
+            rpcClientConnects.clear();
+        }
+        for (Address address : ServiceDiscovery.getServiceAddress()) {
+            rpcClientConnects.add(new RpcClientConnect(address.host, address.port).initBuild());
+        }
+        totalServer = rpcClientConnects.size();
         currentIndex = totalServer - 1;
     }
 
     //简单轮询，不考虑并发
-    public RpcClientInit round() {
+    public RpcClientConnect round() {
+        /*if (rpcClientConnects.size() != ServiceDiscovery.getServiceAddress().size()){
+            load();
+        }*/
         currentIndex = (currentIndex + 1) % totalServer;
-        return rpcClientInits.get(currentIndex);
-    }
-
-    public void setHostAndPort(String host, int port) {
-        this.host = host;
-        this.port = port;
-        initRound();
+        return rpcClientConnects.get(currentIndex);
     }
 
     @Override
     public RpcResponseBody send(RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
         RpcClientV1 client = PoolUtil.getObject(RpcClientV1.class);
-        RpcClientInit rpcClientInit = round();
-        RpcResponseBody response = client.send(rpcClientInit, requestBody);
+        RpcClientConnect rpcClientConnect = round();
+        RpcResponseBody response = client.send(rpcClientConnect, requestBody);
         client.returnObject(); //归还对象到对象池
         return response;
     }

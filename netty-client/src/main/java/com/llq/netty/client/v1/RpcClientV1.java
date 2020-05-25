@@ -1,6 +1,6 @@
 package com.llq.netty.client.v1;
 
-import com.llq.netty.client.RpcClientInit;
+import com.llq.netty.client.RpcClientConnect;
 import com.llq.netty.entity.ResultVo;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
@@ -31,16 +31,16 @@ public class RpcClientV1 extends PoolObject{
      * @throws InterruptedException
      * @throws ExecutionException
      */
-    public RpcResponseBody send(RpcClientInit rpcClientInit, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
+    public RpcResponseBody send(RpcClientConnect rpcClientConnect, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
         try{
             //组装数据
             long streamId = IdUtil.nextId();
             RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
             //添加future到请求等待中心
             RpcResultFuture rpcResultFuture = new RpcResultFuture();
-            rpcClientInit.REQUEST_PENDING_CENTER.add(streamId, rpcResultFuture);
+            rpcClientConnect.REQUEST_PENDING_CENTER.add(streamId, rpcResultFuture);
 
-            rpcClientInit.getChannelFuture().channel().writeAndFlush(request);
+            rpcClientConnect.getChannelFuture().channel().writeAndFlush(request);
 
             RpcResponseBody responseBody = rpcResultFuture.get(6, TimeUnit.SECONDS);
             /*if (responseBody != null) {
