@@ -5,6 +5,8 @@ import com.llq.netty.entity.ResultVo;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
+import com.llq.netty.enums.MessageBodyTypeEnum;
+import com.llq.netty.handler.RequestPendingCenter;
 import com.llq.netty.handler.RpcResultFuture;
 import com.llq.netty.pool.common.PoolObject;
 import com.llq.netty.utils.IdUtil;
@@ -38,7 +40,7 @@ public class RpcClientV1 extends PoolObject{
             RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
             //添加future到请求等待中心
             RpcResultFuture rpcResultFuture = new RpcResultFuture();
-            rpcClientConnect.REQUEST_PENDING_CENTER.add(streamId, rpcResultFuture);
+            RequestPendingCenter.add(streamId, rpcResultFuture);
 
             rpcClientConnect.getChannelFuture().channel().writeAndFlush(request);
 

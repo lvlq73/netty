@@ -2,6 +2,7 @@ package com.llq.netty.handler;
 
 import com.llq.netty.entity.RpcKeepalive;
 import com.llq.netty.entity.RpcMessage;
+import com.llq.netty.enums.MessageBodyTypeEnum;
 import com.llq.netty.utils.IdUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,7 +20,7 @@ public class KeepaliveHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt == IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT) {
             LOGGER.info("write idle happen. so need to send keepalive to keep connection not closed by server");
-            RpcMessage requestMessage = new RpcMessage<RpcKeepalive>(IdUtil.nextId(), new RpcKeepalive());
+            RpcMessage<RpcKeepalive> requestMessage = new RpcMessage<>(IdUtil.nextId(), new RpcKeepalive(), MessageBodyTypeEnum.KEEPALIVE);
             ctx.writeAndFlush(requestMessage);
         }
         super.userEventTriggered(ctx, evt);

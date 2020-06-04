@@ -31,7 +31,7 @@ public class RpcClientConnect {
 
     private String host;
     private int port;
-    public final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
+    //public final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
     //private final static int parallel = Runtime.getRuntime().availableProcessors() * 2;
     private final NioEventLoopGroup GROUP = new NioEventLoopGroup();
 
@@ -76,10 +76,9 @@ public class RpcClientConnect {
                     pipeline.addLast("frameDecoder", new RpcFrameDecoder());
                     pipeline.addLast("frameEncoder", new RpcFrameEncoder());
 
-                    pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
                     pipeline.addLast("protocolDecoder", new RpcProtocolDecoder());
-
-                    pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler(REQUEST_PENDING_CENTER));
+                    pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
+                    pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler());
 
                     pipeline.addLast(keepaliveHandler);
                     //pipeline.addLast(new LoggingHandler(LogLevel.INFO));

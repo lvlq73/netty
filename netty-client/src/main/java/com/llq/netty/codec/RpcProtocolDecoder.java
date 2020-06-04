@@ -18,7 +18,7 @@ public class RpcProtocolDecoder extends MessageToMessageDecoder<ByteBuf>  {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
         RpcMessage<RpcResponseBody> responseBody = new RpcMessage<>();
-        responseBody.decode(byteBuf, RpcResponseBody.class);
+        responseBody.decode(byteBuf);
         out.add(responseBody);
     }
 }

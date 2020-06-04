@@ -1,5 +1,6 @@
 package com.llq.netty.codec;
 
+import com.llq.netty.entity.MessageBody;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
 import io.netty.buffer.ByteBuf;
@@ -16,8 +17,8 @@ import java.util.List;
 public class RpcProtocolDecoder extends MessageToMessageDecoder<ByteBuf>  {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        RpcMessage<RpcRequestBody> requestBody = new RpcMessage<>();
-        requestBody.decode(byteBuf, RpcRequestBody.class);
+        RpcMessage<MessageBody> requestBody = new RpcMessage<>();
+        requestBody.decode(byteBuf);
         out.add(requestBody);
     }
 }

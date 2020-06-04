@@ -1,9 +1,8 @@
 package com.llq.netty.handler;
 
 import com.llq.netty.Server;
-import com.llq.netty.entity.RpcMessage;
-import com.llq.netty.entity.RpcRequestBody;
-import com.llq.netty.entity.RpcResponseBody;
+import com.llq.netty.entity.*;
+import com.llq.netty.enums.MessageBodyTypeEnum;
 import com.llq.netty.ioc.BeanIoc;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -17,7 +16,7 @@ import java.lang.reflect.Method;
  * @description 服务端业务处理
  * @createDate 2020/4/26
  */
-public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcRequestBody>> {
+public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<MessageBody>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcHandler.class);
 
@@ -28,17 +27,21 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<RpcReques
      * @throws Exception
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcMessage<RpcRequestBody> requestMessage) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RpcMessage<MessageBody> requestMessage) throws Exception {
         RpcMessage responseMessage = new RpcMessage();
-        RpcRequestBody requestBody = requestMessage.getMessageBody();
+        MessageBody requestBody = requestMessage.getMessageBody();
         LOGGER.info("服务端接收消息，streamId:{}", requestMessage.getMessageHeader().getStreamId());
-        try {
-            Object result = handle(requestBody);
-            responseMessage.setMessageBody(new RpcResponseBody(result));
-        } catch (Throwable t) {
-            responseMessage.setMessageBody(new RpcResponseBody(t));
+        if (requestBody instanceof RpcRequestBody) {
+            try {
+                Object result = handle((RpcRequestBody) requestBody);
+                responseMessage.setMessageBody(new RpcResponseBody(result));
+            } catch (Throwable t) {
+                responseMessage.setMessageBody(new RpcResponseBody(t));
+            }
         }
-        responseMessage.setMessageHeader(requestMessage.getMessageHeader());
+        MessageHeader messageHeader = requestMessage.getMessageHeader();
+        messageHeader.setType(MessageBodyTypeEnum.RESPONSE.value());
+        responseMessage.setMessageHeader(messageHeader);
         //防止oom内存溢出
         if(ctx.channel().isActive() && ctx.channel().isWritable()) {
             //ctx.writeAndFlush(responseMessage).addListener(ChannelFutureListener.CLOSE);

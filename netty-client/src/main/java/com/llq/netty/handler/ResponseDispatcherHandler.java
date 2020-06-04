@@ -12,15 +12,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class ResponseDispatcherHandler extends SimpleChannelInboundHandler<RpcMessage<RpcResponseBody>> {
 
-    private RequestPendingCenter requestPendingCenter;
+    /*private RequestPendingCenter requestPendingCenter;
 
     public ResponseDispatcherHandler(RequestPendingCenter requestPendingCenter) {
         this.requestPendingCenter = requestPendingCenter;
-    }
+    }*/
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcMessage<RpcResponseBody> response) throws Exception {
-        requestPendingCenter.set(response.getMessageHeader().getStreamId(), response.getMessageBody());
+        RequestPendingCenter.set(response.getMessageHeader().getStreamId(), response.getMessageBody());
     }
 
     @Override

@@ -27,8 +27,8 @@ public class Test {
      */
     private static void registerAddress() {
         ServiceDiscovery.addServiceAddress(new Address("127.0.0.1", 8000));
-        ServiceDiscovery.addServiceAddress(new Address("127.0.0.1", 8001));
-        ServiceDiscovery.addServiceAddress(new Address("127.0.0.1", 8002));
+        //ServiceDiscovery.addServiceAddress(new Address("127.0.0.1", 8001));
+        //ServiceDiscovery.addServiceAddress(new Address("127.0.0.1", 8002));
     }
 
 
@@ -36,7 +36,7 @@ public class Test {
         //注册地址
         registerAddress();
         //并行度10000
-        int parallel = 10000;
+        int parallel = 20000;
         //调用成功计数,用原子long有加锁，速度会变慢
         AtomicInteger successCount = new AtomicInteger();
         //调用失败计数,用原子long有加锁，速度会变慢
@@ -63,8 +63,8 @@ public class Test {
                     try {
                         signal.await();
                         //long start = System.currentTimeMillis();
-                        //String result = helloService.hello("test"+ finalI);
-                        int result = helloService.sum(finalI, finalI * (int)(Math.random() * 10));
+                        String result = helloService.hello("test"+ finalI);
+                        //int result = helloService.sum(finalI, finalI * (int)(Math.random() * 10));
                         System.out.println(result);
                         //successCount.incrementAndGet();
                         // long end = System.currentTimeMillis();

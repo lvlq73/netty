@@ -37,7 +37,7 @@ public class RpcClient extends PoolObject{
 
     private String host;
     private int port;
-    private static final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
+    //private static final RequestPendingCenter REQUEST_PENDING_CENTER = new RequestPendingCenter();
     private static final NioEventLoopGroup GROUP = new NioEventLoopGroup();
 
     /*public RpcClient(String host, int port) {
@@ -82,7 +82,7 @@ public class RpcClient extends PoolObject{
                     pipeline.addLast("protocolEncoder", new RpcProtocolEncoder());
                     pipeline.addLast("protocolDecoder", new RpcProtocolDecoder());
 
-                    pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler(REQUEST_PENDING_CENTER));
+                    pipeline.addLast("dispatcherHandler", new ResponseDispatcherHandler());
 
                     pipeline.addLast(keepaliveHandler);
 
@@ -99,7 +99,7 @@ public class RpcClient extends PoolObject{
             RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
             //添加future到请求等待中心
             RpcResultFuture rpcResultFuture = new RpcResultFuture();
-            REQUEST_PENDING_CENTER.add(streamId, rpcResultFuture);
+            RequestPendingCenter.add(streamId, rpcResultFuture);
 
             channelFuture.channel().writeAndFlush(request);
 

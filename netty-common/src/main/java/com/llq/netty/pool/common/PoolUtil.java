@@ -19,8 +19,9 @@ public class PoolUtil{
     private static final Logger LOGGER = LoggerFactory.getLogger(PoolUtil.class);
 
     private static final int maxTotal = 10;// 最大线程数
-    private static final int maxIdle = 5;// 最大闲置线程
-    private static final int minIdle = 5;// 最小闲置线程
+    private static final int maxIdle = 10;// 最大闲置线程
+    private static final int minIdle = 0;// 最小闲置线程
+    //private static final int maxWaitMillis = 10000;// 最大等待时间
     /**
      * 对象池配置
      */
@@ -30,6 +31,11 @@ public class PoolUtil{
         objectPoolConfig.setMaxTotal(maxTotal);// 最大线程
         objectPoolConfig.setMaxIdle(maxIdle);// 最大闲置线程
         objectPoolConfig.setMinIdle(minIdle);// 最小闲置线程
+        //objectPoolConfig.setMaxWaitMillis(maxWaitMillis);// 最大等待时间
+    }
+
+    private PoolUtil() {
+
     }
 
     /**

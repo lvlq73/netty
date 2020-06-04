@@ -1,5 +1,6 @@
 package com.llq.netty.entity;
 
+import com.llq.netty.enums.MessageBodyTypeEnum;
 import com.llq.netty.utils.ProtostuffUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -15,7 +16,12 @@ public class RpcMessage<T extends MessageBody> {
     public RpcMessage() {}
 
     public RpcMessage(long streamId, T messageBody) {
-        this.messageHeader = new MessageHeader(streamId);
+        this.messageHeader = new MessageHeader(streamId, MessageBodyTypeEnum.REQUEST);
+        this.messageBody = messageBody;
+    }
+
+    public RpcMessage(long streamId, T messageBody, MessageBodyTypeEnum messageBodyTypeEnum) {
+        this.messageHeader = new MessageHeader(streamId, messageBodyTypeEnum);
         this.messageBody = messageBody;
     }
 
@@ -37,10 +43,25 @@ public class RpcMessage<T extends MessageBody> {
     public void encode(ByteBuf byteBuf) {
         byteBuf.writeInt(messageHeader.getVersion());
         byteBuf.writeLong(messageHeader.getStreamId());
+        byteBuf.writeShort(messageHeader.getType());
         byteBuf.writeBytes(ProtostuffUtil.serialize(messageBody));
     }
+    public void decode(ByteBuf msg) {
+        int version = msg.readInt();
+        long streamId = msg.readLong();
+        short type = msg.readShort();
 
-    public void decode(ByteBuf msg, Class<T> genericClass) {
+        MessageHeader messageHeader = new MessageHeader();
+        messageHeader.setVersion(version);
+        messageHeader.setStreamId(streamId);
+        messageHeader.setType(type);
+        this.messageHeader = messageHeader;
+        byte[] data = new byte[msg.readableBytes()];
+        msg.readBytes(data);
+        T body = (T) ProtostuffUtil.deserialize(data, MessageBodyTypeEnum.REQUEST.getTClass(type));
+        this.messageBody = body;
+    }
+    /*public void decode(ByteBuf msg, Class<T> genericClass) {
         int version = msg.readInt();
         long streamId = msg.readLong();
 
@@ -52,5 +73,5 @@ public class RpcMessage<T extends MessageBody> {
         msg.readBytes(data);
         T body = (T) ProtostuffUtil.deserialize(data, genericClass);
         this.messageBody = body;
-    }
+    }*/
 }
