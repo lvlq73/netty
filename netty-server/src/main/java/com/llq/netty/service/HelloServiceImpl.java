@@ -2,6 +2,7 @@ package com.llq.netty.service;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.llq.netty.api.IHelloService;
+import com.llq.netty.scan.RpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @description HelloServiceImpl
  * @createDate 2019/12/12 20:57
  */
+@RpcService(IHelloService.class)
 public class HelloServiceImpl implements IHelloService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
