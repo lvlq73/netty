@@ -1,10 +1,12 @@
 package com.llq.netty.client;
 
-import com.llq.netty.client.v1.RpcClientV1;
+import com.llq.netty.discovery.Address;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
-import com.llq.netty.pool.common.PoolUtil;
+import com.llq.netty.pool.common.PoolWrapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -14,30 +16,44 @@ import java.util.concurrent.ExecutionException;
  */
 public class ClientPool implements IRpcClient {
 
-    private static volatile RpcClientConnect rpcClientConnect;
+    private static final PoolWrapper poolWrapper = new PoolWrapper();
 
-    private static RpcClientConnect getRpcClientInit(String host, int port){
-        if (rpcClientConnect == null) {
-            synchronized (RpcClientConnect.class){
-                if (rpcClientConnect == null) {
-                    rpcClientConnect = new RpcClientConnect(host, port);
-                    rpcClientConnect.init();
-                    System.out.println("init...");
-                }
-            }
+    private List<Address> addresses;
+    private int currentIndex;
+    private int totalServer;
+
+    public ClientPool(String host, int port) {
+        if (this.addresses == null) {
+            this.addresses = new ArrayList<>();
         }
-        return rpcClientConnect;
+        this.addresses.add(new Address(host, port));
+        totalServer = this.addresses.size();
+        currentIndex = totalServer - 1;
+    }
+
+    public ClientPool(List<Address> addresses) {
+        this.addresses = addresses;
+        totalServer = this.addresses.size();
+        currentIndex = totalServer - 1;
+    }
+
+    //简单轮询
+    public Address round() {
+        currentIndex = (currentIndex + 1) % totalServer;
+        return this.addresses.get(currentIndex);
     }
 
     @Override
-    public RpcResponseBody send(String host, int port, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
+    public RpcResponseBody send(RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
         //RpcClient client = PoolUtil.getObject(RpcClient.class); // 初始化 RPC 客户端
         //client.setHostAndPort(host, port);
         //RpcResponseBody response = client.send(requestBody); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
-
-        RpcClientV1 client = PoolUtil.getObject(RpcClientV1.class);
-        RpcClientConnect rpcClientConnect = getRpcClientInit(host, port);
-        RpcResponseBody response = client.send(rpcClientConnect, requestBody);
+        Address address = round();
+        String host = address.host;
+        int port = address.port;
+        String key = host + "_" + port;
+        RpcClient client = poolWrapper.getObject(key, RpcClient.class, new Object[] {host, port});
+        RpcResponseBody response = client.send(requestBody);
         client.returnObject(); //归还对象到对象池
         return response;
     }

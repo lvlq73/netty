@@ -4,8 +4,6 @@ import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
-import java.util.UUID;
-
 /**
  * @author lvlianqi
  * @description 对象池工厂
@@ -14,9 +12,11 @@ import java.util.UUID;
 public class PoolFactory<T> extends BasePooledObjectFactory<T> {
 
     private Class<T> clazz;
+    private Object[] params;
 
-    public PoolFactory(Class<T> clazz) {
+    public PoolFactory(Class<T> clazz, Object[] params) {
         this.clazz = clazz;
+        this.params = params;
     }
 
     /**
@@ -26,7 +26,15 @@ public class PoolFactory<T> extends BasePooledObjectFactory<T> {
      */
     @Override
     public T create() throws Exception {
-        return clazz.newInstance();
+        if (params != null) {
+            Class[] classes = new Class[params.length];
+            for (int i = 0; i < params.length; i++) {
+                classes[i] = params[i].getClass();
+            }
+            return clazz.getConstructor(classes).newInstance(params);
+        } else {
+            return clazz.newInstance();
+        }
     }
     /**
      * 包装对象

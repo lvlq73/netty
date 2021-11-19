@@ -1,10 +1,9 @@
 package com.llq.netty.handler;
 
-import com.llq.netty.Server;
 import com.llq.netty.entity.RpcMessage;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
-import com.llq.netty.ioc.BeanIoc;
+import com.llq.netty.scan.ServiceFactory;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class BusinessThread implements Runnable{
      */
     private Object handle(RpcRequestBody requestBody) throws Throwable {
         String className = requestBody.getClassName();
-        Object serviceBean = BeanIoc.getBean(className);
+        Object serviceBean = ServiceFactory.getBean(className);
 
         Class<?> serviceClass = serviceBean.getClass();
         String methodName = requestBody.getMethodName();

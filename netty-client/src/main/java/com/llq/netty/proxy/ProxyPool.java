@@ -39,7 +39,7 @@ public class ProxyPool extends PoolObject {
                         String host = array[0];
                         int port = Integer.parseInt(array[1]);
 
-                        RpcResponseBody response = rpcClient.send(host, port, request); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
+                        RpcResponseBody response = rpcClient.send(request); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
                         if (response.getError() != null) {
                             throw response.getError();
                         } else {

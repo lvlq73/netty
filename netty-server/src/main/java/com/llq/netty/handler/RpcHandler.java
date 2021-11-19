@@ -1,9 +1,8 @@
 package com.llq.netty.handler;
 
-import com.llq.netty.Server;
 import com.llq.netty.entity.*;
 import com.llq.netty.enums.MessageBodyTypeEnum;
-import com.llq.netty.ioc.BeanIoc;
+import com.llq.netty.scan.ServiceFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -61,7 +60,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<MessageBo
      */
     private Object handle(RpcRequestBody requestBody) throws Throwable {
         String className = requestBody.getClassName();
-        Object serviceBean = BeanIoc.getBean(className);
+        Object serviceBean = ServiceFactory.getBean(className);
 
         Class<?> serviceClass = serviceBean.getClass();
         String methodName = requestBody.getMethodName();
