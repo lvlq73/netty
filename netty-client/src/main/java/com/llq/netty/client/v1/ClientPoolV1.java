@@ -5,7 +5,7 @@ import com.llq.netty.discovery.Address;
 import com.llq.netty.discovery.ServiceDiscovery;
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
-import com.llq.netty.pool.common.PoolUtil;
+import com.llq.netty.pool.common.PoolWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class ClientPoolV1 implements IRpcClientV1 {
 
+    private static final PoolWrapper poolWrapper = new PoolWrapper();
     private List<RpcClientConnect> rpcClientConnects = new ArrayList<>();
     private int currentIndex;
     private int totalServer;
@@ -49,7 +50,7 @@ public class ClientPoolV1 implements IRpcClientV1 {
 
     @Override
     public RpcResponseBody send(RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
-        RpcClientV1 client = PoolUtil.getObject(RpcClientV1.class);
+        RpcClientV1 client = poolWrapper.getObject(RpcClientV1.class, null);
         RpcClientConnect rpcClientConnect = round();
         RpcResponseBody response = client.send(rpcClientConnect, requestBody);
         client.returnObject(); //归还对象到对象池

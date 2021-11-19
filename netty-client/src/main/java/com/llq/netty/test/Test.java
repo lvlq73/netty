@@ -1,9 +1,11 @@
 package com.llq.netty.test;
 
 import com.llq.netty.api.IHelloService;
+import com.llq.netty.client.ClientPool;
 import com.llq.netty.client.v1.ClientPoolV1;
 import com.llq.netty.discovery.Address;
 import com.llq.netty.discovery.ServiceDiscovery;
+import com.llq.netty.proxy.RpcProxy;
 import com.llq.netty.proxy.RpcProxyV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class Test {
         //注册地址
         registerAddress();
         //并行度10000
-        int parallel = 20000;
+        int parallel = 10000;
         //调用成功计数,用原子long有加锁，速度会变慢
         AtomicInteger successCount = new AtomicInteger();
         //调用失败计数,用原子long有加锁，速度会变慢
@@ -51,8 +53,8 @@ public class Test {
         //客户端没有运用对象池
         //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new Client());
         //客户端运用对象池
-        //RpcProxy proxy = new RpcProxy("127.0.0.1:8000", new ClientPool());
-        RpcProxyV1 proxy = new RpcProxyV1(new ClientPoolV1());
+        RpcProxy proxy = new RpcProxy(new ClientPool("127.0.0.1", 8000));
+//        RpcProxyV1 proxy = new RpcProxyV1(new ClientPoolV1());
         IHelloService helloService = proxy.create(IHelloService.class);
         LOGGER.info("并发数据开始准备----------------");
         for (int i = 0; i < parallel; i++) {
@@ -66,11 +68,11 @@ public class Test {
                         String result = helloService.hello("test"+ finalI);
                         //int result = helloService.sum(finalI, finalI * (int)(Math.random() * 10));
                         System.out.println(result);
-                        //successCount.incrementAndGet();
+                        successCount.incrementAndGet();
                         // long end = System.currentTimeMillis();
                         //  System.out.println("耗时："+ (end-start)+"毫秒-----------结果："+result);
                     } catch (Throwable e) {
-                        //failCount.incrementAndGet();
+                        failCount.incrementAndGet();
                         //LOGGER.error("error info", e);
                     } finally {
                         finish.countDown();

@@ -2,7 +2,6 @@ package com.llq.netty.client;
 
 import com.llq.netty.entity.RpcRequestBody;
 import com.llq.netty.entity.RpcResponseBody;
-import com.llq.netty.pool.common.PoolUtil;
 
 import java.util.concurrent.ExecutionException;
 
@@ -13,13 +12,19 @@ import java.util.concurrent.ExecutionException;
  */
 public class Client implements IRpcClient {
 
-    private final RpcClient client = new RpcClient();
+    private String host;
+    private int port;
+
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
-    public RpcResponseBody send(String host, int port, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
+    public RpcResponseBody send(RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
         // 初始化 RPC 客户端
         //RpcClient client = new RpcClient();
-        client.setHostAndPort(host, port);
+        RpcClient client = new RpcClient(host, port);
         RpcResponseBody response = client.send(requestBody);
         return response;
     }
