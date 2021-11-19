@@ -1,6 +1,5 @@
 package com.llq.netty.pool.common;
 
-import com.llq.netty.pool.thread.ThreadPoolHandler;
 import org.apache.commons.pool2.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public abstract class PoolObject {
      */
     private ObjectPool objectPool;
 
-    public void setObjectPool(ObjectPool objectPool){
+    protected void setObjectPool(ObjectPool objectPool){
         this.objectPool = objectPool;
     }
 
@@ -41,7 +40,7 @@ public abstract class PoolObject {
             //System.out.println("---------------------归还对象成功,对象编码："+code);
             //LOGGER.info("---------------------归还对象成功,对象名：{} 对象编码：{}-----------------------------------", this.getClass().getSimpleName(), code);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
