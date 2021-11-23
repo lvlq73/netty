@@ -36,7 +36,7 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         //注册地址
-        registerAddress();
+//        registerAddress();
         //并行度10000
         int parallel = 10000;
         //调用成功计数,用原子long有加锁，速度会变慢
