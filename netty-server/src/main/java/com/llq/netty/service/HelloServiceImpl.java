@@ -10,10 +10,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author lvlianqi
- * @description HelloServiceImpl
+ * @description HelloServiceImpl 测试用
  * @createDate 2019/12/12 20:57
  */
 @RpcService(IHelloService.class)
+@Deprecated
 public class HelloServiceImpl implements IHelloService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

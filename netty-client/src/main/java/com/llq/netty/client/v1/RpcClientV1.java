@@ -10,6 +10,7 @@ import com.llq.netty.handler.RequestPendingCenter;
 import com.llq.netty.handler.RpcResultFuture;
 import com.llq.netty.pool.common.PoolObject;
 import com.llq.netty.utils.IdUtil;
+import com.llq.netty.utils.uuid.UUIDHexGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,8 @@ public class RpcClientV1 extends PoolObject{
     public RpcResponseBody send(RpcClientConnect rpcClientConnect, RpcRequestBody requestBody) throws InterruptedException, ExecutionException {
         try{
             //组装数据
-            long streamId = IdUtil.nextId();
+//            long streamId = IdUtil.nextId();
+            long streamId = UUIDHexGenerator.generateLong();
             RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
             //添加future到请求等待中心
             RpcResultFuture rpcResultFuture = new RpcResultFuture();

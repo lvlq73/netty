@@ -1,5 +1,6 @@
 package com.llq.netty.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.llq.netty.entity.*;
 import com.llq.netty.enums.MessageBodyTypeEnum;
 import com.llq.netty.scan.ServiceFactory;
@@ -18,6 +19,8 @@ import java.lang.reflect.Method;
 public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<MessageBody>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcHandler.class);
+
+    private static final ObjectMapper OM = new ObjectMapper();
 
     /**
      * 接收消息
@@ -66,6 +69,18 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcMessage<MessageBo
         String methodName = requestBody.getMethodName();
         Class<?>[] parameterTypes = requestBody.getParameterTypes();
         Object[] parameters = requestBody.getParameters();
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            if ("java.lang.Class".equals(parameterTypes[i].getName())) {
+                try {
+                    parameters[i] = Class.forName((String) parameters[i]);
+                } catch (ClassNotFoundException e) {
+                    parameters[i] = Object.class;
+                }
+            } else {
+                parameters[i] = OM.convertValue(parameters[i], parameterTypes[i]);
+            }
+        }
 
         Method method = serviceClass.getMethod(methodName, parameterTypes);
         method.setAccessible(true);
