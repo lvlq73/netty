@@ -7,7 +7,7 @@
     <groupId>com.llq.netty</groupId>
     <artifactId>netty-study</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>4.1.39.Final</version>
     <modules>
         <module>netty-server</module>
         <module>netty-client</module>

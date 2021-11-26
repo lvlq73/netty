@@ -12,17 +12,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RequestPendingCenter {
 
-    private static Map<Long, RpcResultFuture> map = new ConcurrentHashMap<>();
+    private static Map<String, RpcResultFuture> map = new ConcurrentHashMap<>();
 
     private RequestPendingCenter() {
 
     }
 
-    public static void add(Long streamId, RpcResultFuture future){
+    public static void add(String streamId, RpcResultFuture future){
         map.put(streamId, future);
     }
 
-    public static void set(Long streamId, RpcResponseBody response){
+    public static void set(String streamId, RpcResponseBody response){
         RpcResultFuture operationResultFuture = map.get(streamId);
         if (operationResultFuture != null) {
             operationResultFuture.setSuccess(response);

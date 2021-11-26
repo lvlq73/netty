@@ -9,39 +9,40 @@ import com.llq.netty.enums.MessageBodyTypeEnum;
  */
 public class MessageHeader {
 
-    private int version = 1;
+    private long version = 1;
     //唯一id(来判断是否为同一个请求)
-    private long streamId;
+    private String streamId;
     //body类型
     private short type;
 
     public MessageHeader() {
     }
 
-    public MessageHeader(long streamId) {
+    public MessageHeader(String streamId) {
         this.streamId = streamId;
     }
 
-    public MessageHeader(long streamId, MessageBodyTypeEnum messageBodyTypeEnum) {
+    public MessageHeader(String streamId, MessageBodyTypeEnum messageBodyTypeEnum) {
         this.streamId = streamId;
         this.type = messageBodyTypeEnum.value();
     }
 
-    public int getVersion() {
+    public long getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(long version) {
         this.version = version;
     }
 
-    public long getStreamId() {
+    public String getStreamId() {
         return streamId;
     }
 
-    public void setStreamId(long streamId) {
+    public void setStreamId(String streamId) {
         this.streamId = streamId;
     }
+
 
     public short getType() {
         return type;

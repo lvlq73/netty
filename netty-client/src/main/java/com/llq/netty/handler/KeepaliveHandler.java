@@ -20,7 +20,8 @@ public class KeepaliveHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt == IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT) {
             LOGGER.info("write idle happen. so need to send keepalive to keep connection not closed by server");
-            RpcMessage<RpcKeepalive> requestMessage = new RpcMessage<>(IdUtil.nextId(), new RpcKeepalive(), MessageBodyTypeEnum.KEEPALIVE);
+            String id = "keepalive_" + IdUtil.nextId();
+            RpcMessage<RpcKeepalive> requestMessage = new RpcMessage<>(id, new RpcKeepalive(), MessageBodyTypeEnum.KEEPALIVE);
             ctx.writeAndFlush(requestMessage);
         }
         super.userEventTriggered(ctx, evt);

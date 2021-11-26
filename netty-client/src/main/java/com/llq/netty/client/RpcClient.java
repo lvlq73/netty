@@ -42,7 +42,7 @@ public class RpcClient extends PoolObject{
         try {
             //组装数据
 //            long streamId = IdUtil.nextId();
-            long streamId = UUIDHexGenerator.generateLong();
+            String streamId = UUIDHexGenerator.generate();
             RpcMessage<RpcRequestBody> request = new RpcMessage<>(streamId, requestBody);
             //添加future到请求等待中心
             RpcResultFuture rpcResultFuture = new RpcResultFuture();

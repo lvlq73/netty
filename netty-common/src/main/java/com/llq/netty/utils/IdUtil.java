@@ -16,7 +16,11 @@ public final class IdUtil {
     }
 
     public static long nextId(){
-        return IDX.incrementAndGet();
+        long id = IDX.incrementAndGet();
+        if (id == Long.MAX_VALUE) {
+            IDX.set(0);
+        }
+        return id;
     }
 
 }
