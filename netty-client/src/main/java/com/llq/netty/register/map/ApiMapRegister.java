@@ -12,7 +12,7 @@ import java.util.*;
 
 /**
  * @author lvlianqi
- * @description 客户端扫描api并注册到spring容器
+ * @description 客户端扫描api并注册到map
  * @date 2021/11/27
  */
 public class ApiMapRegister {
@@ -30,6 +30,7 @@ public class ApiMapRegister {
         }
         register(Arrays.asList(packageName));
     }
+
     public static void register(List<String> packageNames) {
         if (CollectionUtils.isEmpty(packageNames)) {
             return;
