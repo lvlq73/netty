@@ -35,7 +35,6 @@ public class ApiMapRegister {
         if (CollectionUtils.isEmpty(packageNames)) {
             return;
         }
-
         for (String packageName : packageNames) {
             Reflections reflection = new Reflections(packageName);
             Set<Class<?>> classList = reflection.getTypesAnnotatedWith(RpcApi.class);
