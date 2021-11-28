@@ -6,7 +6,7 @@ import com.llq.netty.codec.RpcProtocolDecoder;
 import com.llq.netty.codec.RpcProtocolEncoder;
 import com.llq.netty.handler.RpcHandler;
 import com.llq.netty.handler.ServerIdleCheckHandler;
-import com.llq.netty.scan.ServiceFactory;
+import com.llq.netty.utils.RpcPropertiesUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -23,6 +23,8 @@ import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executors;
+
 /**
  * @author lvlianqi
  * @description RpcServer 服务器
@@ -33,13 +35,34 @@ public class RpcServer {
 
     private String host;
     private int port;
+    private String serviceId = RpcPropertiesUtil.getValue("netty.rpc.serviceId");
+
     //private ServiceRegistry serviceRegistry;
     private NioEventLoopGroup boss = new NioEventLoopGroup(0, new DefaultThreadFactory("boss"));
     private NioEventLoopGroup work = new NioEventLoopGroup(0, new DefaultThreadFactory("work"));
 
+    public RpcServer() {
+        String host = RpcPropertiesUtil.getValue("netty.rpc.host");
+        int port = RpcPropertiesUtil.getValue("netty.rpc.port", Integer.class);
+        if (host == null || host.length() == 0 || port == 0) {
+            throw new RuntimeException("host or port is not set value");
+        }
+        this.host = host;
+        this.port = port;
+    }
+
     public RpcServer(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public void startAsync() {
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                start();
+            }
+        });
     }
 
     public void start() {

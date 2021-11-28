@@ -3,7 +3,7 @@ package com.llq.netty.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.llq.netty.entity.*;
 import com.llq.netty.enums.MessageBodyTypeEnum;
-import com.llq.netty.scan.ServiceFactory;
+import com.llq.netty.factory.ServiceFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;

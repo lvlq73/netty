@@ -1,5 +1,6 @@
-package com.llq.netty.scan;
+package com.llq.netty.factory;
 
+import com.llq.netty.scan.RpcService;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

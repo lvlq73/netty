@@ -7,7 +7,7 @@ import com.llq.netty.codec.RpcProtocolEncoder;
 import com.llq.netty.handler.MetricsHandler;
 import com.llq.netty.handler.RpcHandler;
 import com.llq.netty.handler.ServerIdleCheckHandler;
-import com.llq.netty.scan.ServiceFactory;
+import com.llq.netty.factory.ServiceFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
