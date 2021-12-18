@@ -98,4 +98,8 @@ public class PoolWrapper {
         }
         return objectPool;
     }
+
+    public void remove(String name) {
+        objectPools.remove(name);
+    }
 }

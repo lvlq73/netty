@@ -4,9 +4,13 @@ import com.llq.netty.codec.RpcFrameDecoder;
 import com.llq.netty.codec.RpcFrameEncoder;
 import com.llq.netty.codec.RpcProtocolDecoder;
 import com.llq.netty.codec.RpcProtocolEncoder;
+import com.llq.netty.factory.ServiceFactory;
 import com.llq.netty.handler.RpcHandler;
 import com.llq.netty.handler.ServerIdleCheckHandler;
 import com.llq.netty.utils.RpcPropertiesUtil;
+import com.llq.registry.api.DefaultServiceDiscovery;
+import com.llq.registry.api.IServiceDiscovery;
+import com.llq.registry.pojo.Address;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -22,7 +26,9 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 
 /**
@@ -35,13 +41,19 @@ public class RpcServer {
 
     private String host;
     private int port;
+    private IServiceDiscovery serviceDiscovery = null;
     private String serviceId = RpcPropertiesUtil.getValue("netty.rpc.serviceId");
+    private String packageNames = RpcPropertiesUtil.getValue("netty.rpc.scan");
 
     //private ServiceRegistry serviceRegistry;
     private NioEventLoopGroup boss = new NioEventLoopGroup(0, new DefaultThreadFactory("boss"));
     private NioEventLoopGroup work = new NioEventLoopGroup(0, new DefaultThreadFactory("work"));
 
     public RpcServer() {
+        this(new DefaultServiceDiscovery(RpcPropertiesUtil.getValue("netty.rpc.registry.url")));
+    }
+
+    public RpcServer(IServiceDiscovery serviceDiscovery) {
         String host = RpcPropertiesUtil.getValue("netty.rpc.host");
         int port = RpcPropertiesUtil.getValue("netty.rpc.port", Integer.class);
         if (host == null || host.length() == 0 || port == 0) {
@@ -49,6 +61,7 @@ public class RpcServer {
         }
         this.host = host;
         this.port = port;
+        this.serviceDiscovery = serviceDiscovery;
     }
 
     public RpcServer(String host, int port) {
@@ -66,6 +79,12 @@ public class RpcServer {
     }
 
     public void start() {
+        if (StringUtils.isEmpty(packageNames)) {
+            LOGGER.warn("scan packageNames is null, because netty-rpc.properties -> [netty.rpc.scan] is not value");
+        } else {
+            ServiceFactory.scanService(Arrays.asList(packageNames.split(",")));
+        }
+
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.channel(NioServerSocketChannel.class);
 
@@ -124,11 +143,16 @@ public class RpcServer {
 
             LOGGER.info("服务启动.....端口：{}", port);
 
+            if (serviceDiscovery != null) {
+                serviceId = StringUtils.isEmpty(serviceId) ? host + "_" + port : serviceId;
+                serviceDiscovery.registerService(serviceId, new Address(host, port));
+            }
+
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             LOGGER.error("启动异常", e);
-        }finally {
-            //group.shutdownGracefully();
+        } finally {
+            close();
         }
     }
 

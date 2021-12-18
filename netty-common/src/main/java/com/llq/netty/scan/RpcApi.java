@@ -15,6 +15,6 @@ import java.lang.annotation.Target;
 public @interface RpcApi {
     //别名
     String alias();
-
-    String serviceId() default "";
+    //服务id
+    String serviceId();
 }

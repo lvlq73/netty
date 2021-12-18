@@ -5,6 +5,7 @@ package com.llq.netty.discovery;
  * @description 服务地址
  * @createDate 2020/5/21
  */
+@Deprecated
 public class Address {
     public String host;
 

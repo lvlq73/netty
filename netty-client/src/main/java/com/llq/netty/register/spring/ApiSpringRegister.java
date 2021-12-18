@@ -4,6 +4,9 @@ import com.llq.netty.client.ClientPool;
 import com.llq.netty.proxy.RpcProxy;
 import com.llq.netty.scan.RpcApi;
 import com.llq.netty.utils.RpcPropertiesUtil;
+import com.llq.registry.api.DefaultServiceDiscovery;
+import com.llq.registry.api.IServiceDiscovery;
+import com.llq.registry.pojo.Address;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -21,14 +24,26 @@ import java.util.Set;
  */
 public class ApiSpringRegister implements BeanFactoryPostProcessor {
 
+    private IServiceDiscovery serviceDiscovery = null;
+    private static String URL = RpcPropertiesUtil.getValue("netty.rpc.registry.url");
     private List<String> packageNames = new ArrayList<>();
 
     public ApiSpringRegister(String packageName) {
+        this(packageName, new DefaultServiceDiscovery(URL));
+    }
+
+    public ApiSpringRegister(String packageName, IServiceDiscovery serviceDiscovery) {
         packageNames.add(packageName);
+        this.serviceDiscovery = serviceDiscovery;
     }
 
     public ApiSpringRegister(List<String> packageNames) {
+        this(packageNames, new DefaultServiceDiscovery(URL));
+    }
+
+    public ApiSpringRegister(List<String> packageNames, IServiceDiscovery serviceDiscovery) {
         this.packageNames = packageNames;
+        this.serviceDiscovery = serviceDiscovery;
     }
 
     @Override
@@ -43,9 +58,9 @@ public class ApiSpringRegister implements BeanFactoryPostProcessor {
             for (Class<?> aClass : classList) {
                 RpcApi rpcApi = aClass.getAnnotation(RpcApi.class);
                 String interfaceName = rpcApi.alias();
-                String host = RpcPropertiesUtil.getValue("netty.rpc.host");
-                int port = RpcPropertiesUtil.getValue("netty.rpc.port", Integer.class);
-                RpcProxy rpcProxy = new RpcProxy(new ClientPool(host, port));
+                String serviceId = rpcApi.serviceId();
+                List<Address> addresses = serviceDiscovery.getService(serviceId);
+                RpcProxy rpcProxy = new RpcProxy(new ClientPool(addresses));
                 beanFactory.registerSingleton(interfaceName, rpcProxy.create(aClass));
             }
         }

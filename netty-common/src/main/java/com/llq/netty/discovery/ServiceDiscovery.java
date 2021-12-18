@@ -8,6 +8,7 @@ import java.util.List;
  * @description 服务发现，模拟注册中心（可用zookeeper替换）
  * @createDate 2020/5/21
  */
+@Deprecated
 public class ServiceDiscovery {
 
     private ServiceDiscovery() throws Exception {
