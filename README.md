@@ -113,11 +113,11 @@
       int sum(int one, int two);
   }
   ```
-  客户端代码
+  客户端初始化bean, ApiSpringRegister类将服务端接口类注入到spring容器中
   ```java
   @SpringBootApplication
   public class ClientWebApplication {
-  
+      
       @Bean
       public ApiSpringRegister apiSpringRegister() {
             //扫描service-api（扫描要调用的服务接口）
@@ -131,5 +131,24 @@
   }
   
   ```
-
+  客户端调用测试
+  ```java
+  @RestController
+  @RequestMapping("/test")
+  public class HelloController {
+  
+      @Autowired
+      private IHelloService helloService;
+  
+      @GetMapping("hello")
+      public String test(@RequestParam("name") String name) {
+          return helloService.hello(name);
+      }
+  
+      @GetMapping("sum")
+      public int sum(@RequestParam("num") int num) {
+          return helloService.sum(num, num);
+      }
+  }
+  ```
 
