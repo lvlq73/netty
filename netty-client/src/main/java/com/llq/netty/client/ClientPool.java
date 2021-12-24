@@ -80,7 +80,7 @@ public class ClientPool implements IRpcClient {
             throw new RuntimeException("address list is null");
         }
         totalServer = list.size();
-        currentIndex = totalServer - 1;
+//        currentIndex = totalServer - 1;
         currentIndex = (currentIndex + 1) % totalServer;
         return list.get(currentIndex);
     }
