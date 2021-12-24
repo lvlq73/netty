@@ -68,7 +68,6 @@ public class ClientPool implements IRpcClient {
         if (response.getError() != null && response.getError() instanceof TimeoutException) {
             poolWrapper.remove(key);
         }
-
         return response;
     }
 
