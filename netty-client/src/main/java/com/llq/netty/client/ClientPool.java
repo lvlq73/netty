@@ -72,7 +72,6 @@ public class ClientPool implements IRpcClient {
         return response;
     }
 
-
     //简单轮询
     private Address round() {
         List<Address> list = ServiceAddressCache.getList();
