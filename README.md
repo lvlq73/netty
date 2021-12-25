@@ -19,7 +19,7 @@
 
 ## 应用整合
 > #### demo项目
-以下内容可参考[demo项目](https://github.com/lvlq73/demo )的client-demo和service-demo
+以下内容可参考[demo项目](https://github.com/lvlq73/demo )的client-demo和service-demo，测试时记得启动[注册中心微服务](https://github.com/lvlq73/demo/tree/main/registry-center-service )
 > #### springboot整合
 * ##### [服务端](https://github.com/lvlq73/demo/tree/main/service-demo)
     pom.xml引入netty服务端依赖
