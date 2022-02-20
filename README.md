@@ -11,7 +11,7 @@
 > #### 性能优化
 * 对象池应用
 * 建立多个连接（比如5个），重复利用
-* 多服务，客户通过轮询请求不同服务地址，减少服务的压力（用到自行开发的[注册中心](https://github.com/lvlq73/demo/tree/main/registry-center-service )）
+* 多服务，客户通过轮询请求不同服务地址，减少服务的压力（用到自行开发的[注册中心](https://github.com/lvlq73/registry-center-service )）
 
 > #### 本地自测情况
 * 10000万并发请求，处理时间15~17秒左右，成功率99.9%~100%
@@ -19,7 +19,7 @@
 
 ## 应用整合
 > #### demo项目
-以下内容可参考[demo项目](https://github.com/lvlq73/demo )的client-demo和service-demo，测试时记得启动[注册中心微服务](https://github.com/lvlq73/demo/tree/main/registry-center-service )
+以下内容可参考[demo项目](https://github.com/lvlq73/demo )的client-demo和service-demo，测试时记得启动[注册中心微服务](https://github.com/lvlq73/registry-center-service )
 > #### springboot整合
 * ##### [服务端](https://github.com/lvlq73/demo/tree/main/service-demo)
     pom.xml引入netty服务端依赖
