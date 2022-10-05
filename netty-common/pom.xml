@@ -25,7 +25,7 @@
     <!--<guava.version>20.0</guava.version>-->
     <fastjson.version>1.2.73</fastjson.version>
     <reflections.version>0.10.2</reflections.version>
-    <jackson.version>2.13.0</jackson.version>
+    <jackson.version>2.13.2.1</jackson.version>
     <llq.registry.version>1.0-SNAPSHOT</llq.registry.version>
   </properties>
 
